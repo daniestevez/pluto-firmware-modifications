@@ -35,8 +35,11 @@ mv Linux zImage
 mv Ramdisk rootfs.cpio.gz
 ```
 
-Now we can replace some of these files as required with our modifications, and
-build the FIT image and `.frm` file as described in the
+Now we can replace some of these files as required with our modifications. In 
+order to modify the rootfs, is is necessary to extract it and re-pack it as 
+indicated 
+[`below`](https://github.com/daniestevez/pluto-firmware-modifications/edit/main/README.md#extraction-and-re-packing-of-the-rootfs)
+. Then we can build the FIT image and `.frm` file as described in the
 [ADI
 Wiki](https://wiki.analog.com/university/tools/pluto/building_the_image#build_multi_component_fit_image_flattened_image_tree).
 This requires `mkimage`, which is usually contained in the package `uboot-tools`
@@ -50,4 +53,25 @@ wget https://raw.githubusercontent.com/analogdevicesinc/plutosdr-fw/master/scrip
 mkimage -f pluto.its pluto.itb
 md5sum pluto.itb | cut -d ' ' -f 1 > pluto.frm.md5
 cat pluto.itb pluto.frm.md5 > pluto.frm
+mv pluto.itb pluto.dfu
+dfu-suffix -a pluto.dfu -v 0x0456 -p 0xb673
+```
+
+## Extraction and re-packing of the rootfs
+
+Extraction
+ 
+```
+gzip -d rootfs.cpio.gz
+mkdir rootfs
+cd rootfs
+cpio -id < ../rootfs.cpio
+```
+
+Re-packing
+
+```
+rm ../rootfs.cpio
+find . | cpio --quiet -o -H newc > ../rootfs.cpio
+gzip rootfs.cpio
 ```
