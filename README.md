@@ -35,8 +35,32 @@ mv Linux zImage
 mv Ramdisk rootfs.cpio.gz
 ```
 
-We need to extract and create a working copy of the `rootfs` tree.
+Now we can replace some of these files as required with our modifications. In 
+order to modify the rootfs, is is necessary to extract it and re-pack it as 
+indicated 
+[`below`](https://github.com/DeonMarais64/pluto-firmware-modifications/edit/patch-1/README.md?pr=%2Fdaniestevez%2Fpluto-firmware-modifications%2Fpull%2F2#extraction-and-re-packing-of-the-rootfs)
+. Then we can build the FIT image and `.frm` file as described in the
+[ADI
+Wiki](https://wiki.analog.com/university/tools/pluto/building_the_image#build_multi_component_fit_image_flattened_image_tree).
+This requires `mkimage`, which is usually contained in the package `uboot-tools`
+in Linux distributions.
 
+```
+cd ..
+mkdir new_frm
+cd new_frm
+wget https://raw.githubusercontent.com/analogdevicesinc/plutosdr-fw/master/scripts/pluto.its
+mkimage -f pluto.its pluto.itb
+md5sum pluto.itb | cut -d ' ' -f 1 > pluto.frm.md5
+cat pluto.itb pluto.frm.md5 > pluto.frm
+mv pluto.itb pluto.dfu
+dfu-suffix -a pluto.dfu -v 0x0456 -p 0xb673
+```
+
+## Extraction and re-packing of the rootfs
+
+Extraction
+ 
 ```
 gzip -d rootfs.cpio.gz
 mkdir rootfs
@@ -44,36 +68,10 @@ cd rootfs
 cpio -id < ../rootfs.cpio
 ```
 
-Now we can replace some of these files as required with our modifications and/or add additional files to the `rootfs` tree.
-
-## Recreation of the Pluto firmware image
-
-`rootfs.cpio.gz` needs to be recreated.
+Re-packing
 
 ```
 rm ../rootfs.cpio
-find . | cpio --quiet -ov -H newc > ../rootfs.cpio
-cd ..
+find . | cpio --quiet -o -H newc > ../rootfs.cpio
 gzip rootfs.cpio
-```
-
-We need to build the FIT image and `.dfu` and/or `.frm` file's as described in the
-[ADI
-Wiki](https://wiki.analog.com/university/tools/pluto/building_the_image#build_multi_component_fit_image_flattened_image_tree).
-This requires `mkimage`, which is usually contained in the package `uboot-tools` in Linux distributions.
-
-```
-cd ..
-mkdir new_frm
-cd new_frm
-wget https://raw.githubusercontent.com/analogdevicesinc/plutosdr-fw/master/scripts/pluto.its
-
-mkimage -f pluto.its pluto.itb
-
-cp pluto.itb pluto.itb.tmp
-dfu-suffix -a pluto.itb.tmp -v 0x0456 -p 0xb673
-mv pluto.itb.tmp pluto.dfu
-
-md5sum pluto.itb | cut -d ' ' -f 1 > pluto.frm.md5
-cat pluto.itb pluto.frm.md5 > pluto.frm
 ```
