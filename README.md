@@ -38,7 +38,7 @@ mv Ramdisk rootfs.cpio.gz
 Now we can replace some of these files as required with our modifications. In 
 order to modify the rootfs, is is necessary to extract it and re-pack it as 
 indicated 
-[`below`](https://github.com/daniestevez/pluto-firmware-modifications/edit/main/README.md#extraction-and-re-packing-of-the-rootfs)
+[`below`](#extraction-and-re-packing-of-the-rootfs)
 . Then we can build the FIT image and `.frm` file as described in the
 [ADI
 Wiki](https://wiki.analog.com/university/tools/pluto/building_the_image#build_multi_component_fit_image_flattened_image_tree).
