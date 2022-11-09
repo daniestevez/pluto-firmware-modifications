@@ -36,7 +36,7 @@ mv Ramdisk rootfs.cpio.gz
 ```
 
 Now we can replace some of these files as required with our modifications. In 
-order to modify the rootfs, is is necessary to extract it and re-pack it as 
+order to modify the rootfs, it is necessary to extract it and re-pack it as 
 indicated 
 [`below`](#extraction-and-re-packing-of-the-rootfs)
 . Then we can build the FIT image and `.frm` file as described in the
@@ -73,5 +73,6 @@ Re-packing
 ```
 rm ../rootfs.cpio
 find . | cpio --quiet -o -H newc > ../rootfs.cpio
+cd ..
 gzip rootfs.cpio
 ```
